@@ -1,4 +1,2 @@
 streamlit
-crewai
-litellm
-groq
+crewai[openai]
