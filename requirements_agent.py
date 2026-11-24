@@ -1,45 +1,31 @@
 import os
-
 from crewai import Agent, Task, Crew, LLM
 
 
 def run_requirements_agent(applicant_profile, programs):
-    """
-    Run the Admission Requirements Agent.
-    """
 
     llm = LLM(
-        model="groq/openai/gpt-oss-120b",
-        api_key=os.getenv("GROQ_API_KEY"),
-        temperature=0.2,
+        model="openai/openai/gpt-oss-120b",
+        custom_openai=True,
+        base_url="https://api.groq.com/openai/v1",
+        api_key=os.environ["GROQ_API_KEY"],
     )
 
-    requirements_agent = Agent(
+    agent = Agent(
         role="University Admission Requirements Analyst",
-
-        goal=(
-            "Analyze the provided university programs and identify "
-            "the admission requirements relevant to the student."
-        ),
-
+        goal="Analyze university admission requirements.",
         backstory=(
-            "You are an admission requirements specialist familiar "
-            "with the Pakistani education system. You understand "
-            "Matric, Intermediate/HSSC, Bachelor's and Master's "
-            "qualifications. You carefully examine the provided "
-            "program information and never invent requirements."
+            "You are an admission requirements specialist "
+            "familiar with the Pakistani education system."
         ),
-
         llm=llm,
-
         allow_delegation=False,
-
         verbose=False,
     )
 
     task = Task(
         description=f"""
-        Analyze the university programs provided below.
+        Analyze the university admission requirements.
 
         STUDENT PROFILE:
         {applicant_profile}
@@ -47,42 +33,28 @@ def run_requirements_agent(applicant_profile, programs):
         AVAILABLE PROGRAMS:
         {programs}
 
-        Identify the admission requirements relevant to this student.
-
-        For each relevant program, explain:
-
-        1. Required academic qualification
+        Explain:
+        1. Required qualification
         2. Minimum CGPA or percentage
         3. Required academic background
-        4. Entry test requirement
-        5. English language requirement
+        4. Entry test requirements
 
-        Important rules:
-
-        - Use ONLY the information provided.
-        - Do not invent university requirements.
-        - If information is missing, clearly say:
-          "Not specified in the provided data."
+        Rules:
+        - Use only the provided program data.
+        - Never invent admission requirements.
+        - Mention missing information clearly.
         - Consider the Pakistani education system.
-        - GRE and GMAT should NOT be added unless explicitly
-          present in the provided program data.
-        - Keep the explanation simple and beginner-friendly.
         """,
-
-        expected_output="""
-        A clear program-by-program summary of admission requirements.
-        Mention missing information explicitly.
-        """,
-
-        agent=requirements_agent,
+        expected_output=(
+            "A program-by-program admission requirements report."
+        ),
+        agent=agent,
     )
 
     crew = Crew(
-        agents=[requirements_agent],
+        agents=[agent],
         tasks=[task],
         verbose=False,
     )
 
-    result = crew.kickoff()
-
-    return str(result)
+    return str(crew.kickoff())
