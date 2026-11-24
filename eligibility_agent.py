@@ -1,46 +1,31 @@
 import os
-
 from crewai import Agent, Task, Crew, LLM
 
 
 def run_eligibility_agent(applicant_profile, programs):
-    """
-    Run the Eligibility Agent.
-    """
 
     llm = LLM(
-        model="groq/openai/gpt-oss-120b",
-        api_key=os.getenv("GROQ_API_KEY"),
-        temperature=0.2,
+        model="openai/openai/gpt-oss-120b",
+        custom_openai=True,
+        base_url="https://api.groq.com/openai/v1",
+        api_key=os.environ["GROQ_API_KEY"],
     )
 
-    eligibility_agent = Agent(
+    agent = Agent(
         role="University Eligibility Evaluator",
-
-        goal=(
-            "Evaluate the student's eligibility for the provided "
-            "university programs."
-        ),
-
+        goal="Evaluate student eligibility for university programs.",
         backstory=(
-            "You are an academic eligibility evaluator familiar "
-            "with the Pakistani education system. You compare "
-            "student qualifications with the admission requirements "
-            "provided for each program. You do not make assumptions "
-            "when information is missing."
+            "You are an academic eligibility evaluator "
+            "familiar with Pakistani university admission criteria."
         ),
-
         llm=llm,
-
         allow_delegation=False,
-
         verbose=False,
     )
 
     task = Task(
         description=f"""
-        Evaluate the student's eligibility for the available
-        university programs.
+        Evaluate the student's eligibility.
 
         STUDENT PROFILE:
         {applicant_profile}
@@ -48,49 +33,38 @@ def run_eligibility_agent(applicant_profile, programs):
         AVAILABLE PROGRAMS:
         {programs}
 
-        For each relevant program, classify the student's status as:
+        For each relevant program, classify the student as:
 
-        - Appears Eligible
-        - Appears Not Eligible
-        - Cannot Determine
+        1. Appears Eligible
+        2. Appears Not Eligible
+        3. Cannot Determine
 
         Consider:
+        - Academic qualification
+        - Field or major
+        - CGPA
+        - Percentage
+        - Target degree
+        - Entry test
 
-        1. Current qualification
-        2. Field / major
-        3. CGPA
-        4. Percentage
-        5. Target degree
-        6. Entry test
-        7. English proficiency
-
-        Important rules:
-
-        - Use ONLY the provided program requirements.
-        - Do not invent requirements.
-        - Do not assume that missing information satisfies a requirement.
-        - If an important requirement is unknown, use
-          "Cannot Determine".
-        - Do not use GRE or GMAT unless they are explicitly listed
-          in the provided program requirements.
-        - Explain the reason for each result.
-        - Keep the answer simple.
+        Rules:
+        - Use only provided requirements.
+        - Do not invent admission criteria.
+        - Missing information must not automatically
+          be considered eligible.
+        - Explain the reason for each decision.
         """,
-
-        expected_output="""
-        A program-by-program eligibility assessment containing:
-        program name, eligibility status, and a short explanation.
-        """,
-
-        agent=eligibility_agent,
+        expected_output=(
+            "A program-by-program eligibility assessment "
+            "with status and explanation."
+        ),
+        agent=agent,
     )
 
     crew = Crew(
-        agents=[eligibility_agent],
+        agents=[agent],
         tasks=[task],
         verbose=False,
     )
 
-    result = crew.kickoff()
-
-    return str(result)
+    return str(crew.kickoff())
