@@ -1,6 +1,6 @@
 PROGRAMS = [
     {
-        "university": "Demo University",
+        "university": "University of Okara",
         "program": "MS Computer Science",
         "degree_level": "MS",
         "minimum_qualification": "Relevant Bachelor's degree",
@@ -16,7 +16,7 @@ PROGRAMS = [
     },
 
     {
-        "university": "Demo University",
+        "university": "University of Okara",
         "program": "MS Artificial Intelligence",
         "degree_level": "MS",
         "minimum_qualification": "Relevant Bachelor's degree",
@@ -33,7 +33,7 @@ PROGRAMS = [
     },
 
     {
-        "university": "Demo University",
+        "university": "University of Okara",
         "program": "MS Data Science",
         "degree_level": "MS",
         "minimum_qualification": "Relevant Bachelor's degree",
@@ -50,7 +50,7 @@ PROGRAMS = [
     },
 
     {
-        "university": "Demo University",
+        "university": "University of Okara",
         "program": "BS Computer Science",
         "degree_level": "BS",
         "minimum_qualification": "Intermediate / HSSC or equivalent",
@@ -63,7 +63,7 @@ PROGRAMS = [
     },
 
     {
-        "university": "Demo University",
+        "university": "University of Okara",
         "program": "BS Artificial Intelligence",
         "degree_level": "BS",
         "minimum_qualification": "Intermediate / HSSC or equivalent",
